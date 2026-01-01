@@ -13,7 +13,13 @@ def generate_signal(noise_level, num_points=100):
 
     return time, signal
 
-
+def moving_average(signal, window_size=5):
+    filtered = []
+    for i in range(len(signal)):
+        start = max(0, i - window_size + 1)
+        window = signal[start:i + 1]
+        filtered.append(sum(window) / len(window))
+    return filtered
 if __name__ == "__main__":
     # Generate two signals
     time, signal_low_noise = generate_signal(noise_level=0.1)
@@ -23,12 +29,15 @@ if __name__ == "__main__":
     print("Low noise average:", sum(signal_low_noise) / len(signal_low_noise))
     print("High noise average:", sum(signal_high_noise) / len(signal_high_noise))
 
+    filtered_low = moving_average(signal_low_noise, window_size=5)
+    filtered_high = moving_average(signal_high_noise, window_size=5)
     # Plot signals
-    plt.figure(figsize=(10, 4))
-    plt.plot(time, signal_low_noise, label="Low Noise")
-    plt.plot(time, signal_high_noise, label="High Noise", alpha=0.7)
+    plt.figure(figsize=(10,5))
 
-    plt.title("Simulated Physiological Signal")
+    plt.plot(time, signal_high_noise, label="Raw High Noise", alpha=0.4)
+    plt.plot(time, filtered_high, label="Filtered High Noise", linewidth=2)
+
+    plt.title("Signal Filtering Improves Interpretability")
     plt.xlabel("Time")
     plt.ylabel("Signal Value")
     plt.legend()
