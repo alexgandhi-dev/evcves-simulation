@@ -13,13 +13,19 @@ def generate_signal(noise_level, num_points=100):
 
     return time, signal
 
-def moving_average(signal, window_size=5):
+def moving_average(signal, window_size=10):
     filtered = []
     for i in range(len(signal)):
         start = max(0, i - window_size + 1)
         window = signal[start:i + 1]
         filtered.append(sum(window) / len(window))
     return filtered
+
+def mean_absolute_difference(signal_a, signal_b):
+    diffs = []
+    for a, b in zip(signal_a, signal_b):
+        diffs.append(abs(a-b))
+    return sum(diffs) / len(diffs)
 if __name__ == "__main__":
     # Generate two signals
     time, signal_low_noise = generate_signal(noise_level=0.1)
@@ -31,6 +37,9 @@ if __name__ == "__main__":
 
     filtered_low = moving_average(signal_low_noise, window_size=5)
     filtered_high = moving_average(signal_high_noise, window_size=5)
+
+    distortion = mean_absolute_difference(signal_high_noise, filtered_high)
+    print(f"Filtering distortion: {distortion}")
     # Plot signals
     plt.figure(figsize=(10,5))
 
