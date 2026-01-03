@@ -26,10 +26,19 @@ def mean_absolute_difference(signal_a, signal_b):
     for a, b in zip(signal_a, signal_b):
         diffs.append(abs(a-b))
     return sum(diffs) / len(diffs)
+
+def exponential_moving_average(signal, alpha=0.2):
+    filtered = [signal[0]]
+    for i in range(1, len(signal)):
+        filtered.append(alpha * signal[i] + (1 - alpha) * filtered[-1])
+    return filtered
 if __name__ == "__main__":
     # Generate two signals
     time, signal_low_noise = generate_signal(noise_level=0.1)
     _, signal_high_noise = generate_signal(noise_level=0.5)
+
+    ma_filtered = moving_average(signal_high_noise, window_size=5)
+    ema_filtered = exponential_moving_average(signal_high_noise, alpha=0.2)
 
     # Print statistics
     print("Low noise average:", sum(signal_low_noise) / len(signal_low_noise))
@@ -41,13 +50,15 @@ if __name__ == "__main__":
     distortion = mean_absolute_difference(signal_high_noise, filtered_high)
     print(f"Filtering distortion: {distortion}")
     # Plot signals
-    plt.figure(figsize=(10,5))
+    plt.figure(figsize=(10, 5))
 
-    plt.plot(time, signal_high_noise, label="Raw High Noise", alpha=0.4)
-    plt.plot(time, filtered_high, label="Filtered High Noise", linewidth=2)
+    plt.plot(time, signal_high_noise, label="Raw High Noise", alpha=0.3)
+    plt.plot(time, ma_filtered, label="Moving Average", linewidth=2)
+    plt.plot(time, ema_filtered, label="Exponential MA", linewidth=2)
 
-    plt.title("Signal Filtering Improves Interpretability")
+    plt.title("Comparing Filtering Strategies")
     plt.xlabel("Time")
     plt.ylabel("Signal Value")
     plt.legend()
     plt.show()
+
