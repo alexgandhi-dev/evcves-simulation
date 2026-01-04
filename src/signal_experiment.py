@@ -38,7 +38,7 @@ if __name__ == "__main__":
     _, signal_high_noise = generate_signal(noise_level=0.5)
 
     ma_filtered = moving_average(signal_high_noise, window_size=5)
-    ema_filtered = exponential_moving_average(signal_high_noise, alpha=0.2)
+    # ema_filtered = exponential_moving_average(signal_high_noise, alpha=0.2)
 
     # Print statistics
     print("Low noise average:", sum(signal_low_noise) / len(signal_low_noise))
@@ -54,9 +54,9 @@ if __name__ == "__main__":
 
     plt.plot(time, signal_high_noise, label="Raw High Noise", alpha=0.3)
     plt.plot(time, ma_filtered, label="Moving Average", linewidth=2)
-    plt.plot(time, ema_filtered, label="Exponential MA", linewidth=2)
+    # plt.plot(time, ema_filtered, label="Exponential MA", linewidth=2)
 
-    plt.title("Comparing Filtering Strategies")
+    plt.title("Chosen Filtering Strategy for EVCVES (Initial)")
     plt.xlabel("Time")
     plt.ylabel("Signal Value")
     plt.legend()
