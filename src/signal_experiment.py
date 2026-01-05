@@ -9,6 +9,8 @@ def generate_signal(noise_level, num_points=100):
 
     for t in time:
         value = math.sin(t * 0.1) + random.uniform(-noise_level, noise_level)
+        if 40 <= t <= 45:
+            value += 1.5
         signal.append(value)
 
     return time, signal
@@ -38,7 +40,7 @@ if __name__ == "__main__":
     _, signal_high_noise = generate_signal(noise_level=0.5)
 
     ma_filtered = moving_average(signal_high_noise, window_size=5)
-    # ema_filtered = exponential_moving_average(signal_high_noise, alpha=0.2)
+    ema_filtered = exponential_moving_average(signal_high_noise, alpha=0.2)
 
     # Print statistics
     print("Low noise average:", sum(signal_low_noise) / len(signal_low_noise))
@@ -54,7 +56,7 @@ if __name__ == "__main__":
 
     plt.plot(time, signal_high_noise, label="Raw High Noise", alpha=0.3)
     plt.plot(time, ma_filtered, label="Moving Average", linewidth=2)
-    # plt.plot(time, ema_filtered, label="Exponential MA", linewidth=2)
+    plt.plot(time, ema_filtered, label="Exponential MA", linewidth=2)
 
     plt.title("Chosen Filtering Strategy for EVCVES (Initial)")
     plt.xlabel("Time")
