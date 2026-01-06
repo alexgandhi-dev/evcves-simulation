@@ -2,6 +2,7 @@ import math
 import random
 import matplotlib.pyplot as plt
 
+MODE = "transient"      # options: "visualization", "transient"
 
 def generate_signal(noise_level, num_points=100):
     time = list(range(num_points))
@@ -15,7 +16,7 @@ def generate_signal(noise_level, num_points=100):
 
     return time, signal
 
-def moving_average(signal, window_size=10):
+def moving_average(signal, window_size):
     filtered = []
     for i in range(len(signal)):
         start = max(0, i - window_size + 1)
@@ -39,26 +40,22 @@ if __name__ == "__main__":
     time, signal_low_noise = generate_signal(noise_level=0.1)
     _, signal_high_noise = generate_signal(noise_level=0.5)
 
-    ma_filtered = moving_average(signal_high_noise, window_size=5)
-    ema_filtered = exponential_moving_average(signal_high_noise, alpha=0.2)
+    if MODE =="visualization":
+        filtered_signal = moving_average(signal_high_noise, window_size=5)
+    elif MODE == "transient":
+        filtered_signal = exponential_moving_average(signal_high_noise, alpha=0.6)
+    else:
+        raise ValueError("Unknown MODE selected")
 
-    # Print statistics
-    print("Low noise average:", sum(signal_low_noise) / len(signal_low_noise))
-    print("High noise average:", sum(signal_high_noise) / len(signal_high_noise))
-
-    filtered_low = moving_average(signal_low_noise, window_size=5)
-    filtered_high = moving_average(signal_high_noise, window_size=5)
-
-    distortion = mean_absolute_difference(signal_high_noise, filtered_high)
-    print(f"Filtering distortion: {distortion}")
+    distortion = mean_absolute_difference(signal_high_noise, filtered_signal)
+    print(f"Filtering distortion ({MODE} mode): {distortion}")
     # Plot signals
     plt.figure(figsize=(10, 5))
 
     plt.plot(time, signal_high_noise, label="Raw High Noise", alpha=0.3)
-    plt.plot(time, ma_filtered, label="Moving Average", linewidth=2)
-    plt.plot(time, ema_filtered, label="Exponential MA", linewidth=2)
+    plt.plot(time, filtered_signal, label=f"{MODE.capitalize()} Filter", linewidth=2)
 
-    plt.title("Chosen Filtering Strategy for EVCVES (Initial)")
+    plt.title(f"EVCVES Filtering Mode: {MODE.capitalize()}")
     plt.xlabel("Time")
     plt.ylabel("Signal Value")
     plt.legend()
