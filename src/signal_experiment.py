@@ -2,7 +2,7 @@ import math
 import random
 import matplotlib.pyplot as plt
 
-MODE = "transient"      # options: "visualization", "transient"
+MODE = "visualization"      # options: "visualization", "transient"
 
 def generate_signal(noise_level, num_points=100):
     time = list(range(num_points))
@@ -35,6 +35,13 @@ def exponential_moving_average(signal, alpha=0.2):
     for i in range(1, len(signal)):
         filtered.append(alpha * signal[i] + (1 - alpha) * filtered[-1])
     return filtered
+
+def signal_variability(signal):
+    diffs = []
+    for i in range(1, len(signal)):
+        diffs.append(abs(signal[i] - signal[i-1]))
+    return sum(diffs) / len(diffs)
+
 if __name__ == "__main__":
     # Generate two signals
     time, signal_low_noise = generate_signal(noise_level=0.1)
@@ -46,6 +53,15 @@ if __name__ == "__main__":
         filtered_signal = exponential_moving_average(signal_high_noise, alpha=0.6)
     else:
         raise ValueError("Unknown MODE selected")
+
+    if MODE == "visualization" and variability > 0.4:
+        print("Advisory: High signal variability detected. Transient review mode may be appropriate.")
+
+    variability = signal_variability(signal_high_noise)
+    print(f"Signal Variability: {variability}")
+
+    if MODE == "visualization" and variability > 0.4:
+        print("Advisory: High signal variability detected. Transient review mode may be appropriate.")
 
     distortion = mean_absolute_difference(signal_high_noise, filtered_signal)
     print(f"Filtering distortion ({MODE} mode): {distortion}")
