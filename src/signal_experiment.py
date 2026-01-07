@@ -2,15 +2,16 @@ import math
 import random
 import matplotlib.pyplot as plt
 
+VARIABILITY_THRESHOLD = 0.25
 MODE = "visualization"      # options: "visualization", "transient"
 
-def generate_signal(noise_level, num_points=100):
+def generate_signal(noise_level, num_points=100, include_transient = False):
     time = list(range(num_points))
     signal = []
 
     for t in time:
         value = math.sin(t * 0.1) + random.uniform(-noise_level, noise_level)
-        if 40 <= t <= 45:
+        if include_transient and 40 <= t <= 45:
             value += 1.5
         signal.append(value)
 
@@ -45,7 +46,7 @@ def signal_variability(signal):
 if __name__ == "__main__":
     # Generate two signals
     time, signal_low_noise = generate_signal(noise_level=0.1)
-    _, signal_high_noise = generate_signal(noise_level=0.5)
+    _, signal_high_noise = generate_signal(noise_level=0.5, include_transient=True)
 
     if MODE =="visualization":
         filtered_signal = moving_average(signal_high_noise, window_size=5)
@@ -54,14 +55,11 @@ if __name__ == "__main__":
     else:
         raise ValueError("Unknown MODE selected")
 
-    if MODE == "visualization" and variability > 0.4:
-        print("Advisory: High signal variability detected. Transient review mode may be appropriate.")
-
     variability = signal_variability(signal_high_noise)
     print(f"Signal Variability: {variability}")
 
-    if MODE == "visualization" and variability > 0.4:
-        print("Advisory: High signal variability detected. Transient review mode may be appropriate.")
+    if MODE == "visualization" and variability > VARIABILITY_THRESHOLD:
+        print("Advisory: Signal variability exceeds threshold. Transient review mode may be appropriate.")
 
     distortion = mean_absolute_difference(signal_high_noise, filtered_signal)
     print(f"Filtering distortion ({MODE} mode): {distortion}")
