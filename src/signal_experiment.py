@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 VARIABILITY_THRESHOLD = 0.25
 MODE = "visualization"      # options: "visualization", "transient"
 
-def generate_signal(noise_level, num_points=100, include_transient = False):
+audit_log = []
+
+def generate_signal(noise_level, num_points=100, include_transient = True):
     time = list(range(num_points))
     signal = []
 
@@ -57,9 +59,15 @@ if __name__ == "__main__":
 
     variability = signal_variability(signal_high_noise)
     print(f"Signal Variability: {variability}")
+    audit_log.append({"metric": "signal variability", "value": variability,
+                      "threshold": VARIABILITY_THRESHOLD, "mode": MODE})
 
     if MODE == "visualization" and variability > VARIABILITY_THRESHOLD:
-        print("Advisory: Signal variability exceeds threshold. Transient review mode may be appropriate.")
+        message = ("High signal variability detected. "
+                   "Transient review mode may be appropriate.")
+        print("Advisory:", message)
+        audit_log.append({"decision": "advisory", "reason": "variability_exceeded",
+                          "message": message})
 
     distortion = mean_absolute_difference(signal_high_noise, filtered_signal)
     print(f"Filtering distortion ({MODE} mode): {distortion}")
@@ -75,3 +83,6 @@ if __name__ == "__main__":
     plt.legend()
     plt.show()
 
+    print("\nAudit Log:")
+    for entry in audit_log:
+        print(entry)
