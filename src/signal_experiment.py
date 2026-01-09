@@ -45,6 +45,12 @@ def signal_variability(signal):
         diffs.append(abs(signal[i] - signal[i-1]))
     return sum(diffs) / len(diffs)
 
+def clinician_advisory_message(variability_exceeded):
+    if variability_exceeded:
+        return "Signal shows increased variability. Consider reviewing transient activity."
+    else:
+        return "Signal behavior appears stable."
+
 if __name__ == "__main__":
     # Generate two signals
     time, signal_low_noise = generate_signal(noise_level=0.1)
@@ -62,12 +68,24 @@ if __name__ == "__main__":
     audit_log.append({"metric": "signal variability", "value": variability,
                       "threshold": VARIABILITY_THRESHOLD, "mode": MODE})
 
-    if MODE == "visualization" and variability > VARIABILITY_THRESHOLD:
-        message = ("High signal variability detected. "
-                   "Transient review mode may be appropriate.")
-        print("Advisory:", message)
-        audit_log.append({"decision": "advisory", "reason": "variability_exceeded",
-                          "message": message})
+    variability_exceeded = variability > VARIABILITY_THRESHOLD
+
+    # Log advisory decision (engineer-facing)
+    if MODE == "visualization" and variability_exceeded:
+        audit_log.append({
+            "decision": "advisory",
+            "reason": "variability_exceeded",
+            "threshold": VARIABILITY_THRESHOLD,
+            "value": variability })
+    # Clinician-facing output
+    print("\nClinician View:")
+    print(clinician_advisory_message(variability_exceeded))
+
+    # Engineer-facing output
+    print("\nEngineer View:")
+    print(f"Mode: {MODE}")
+    print(f"Signal Variability: {variability}")
+    print(f"Threshold: {VARIABILITY_THRESHOLD}")
 
     distortion = mean_absolute_difference(signal_high_noise, filtered_signal)
     print(f"Filtering distortion ({MODE} mode): {distortion}")
