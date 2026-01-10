@@ -51,6 +51,19 @@ def clinician_advisory_message(variability_exceeded):
     else:
         return "Signal behavior appears stable."
 
+def clinician_summary(variability_exceeded):
+    if variability_exceeded:
+        return("Summary: Signal  behavior increased variability during this run. \n"
+               "A brief review for transient activity is recommended.")
+    else:
+        return("Summary: Signal behavior remained stable throughout this run. \n"
+               "No transient review is recommended.")
+
+def engineer_summary(mode, variability, threshold, distortion):
+    return(f"Summary: Run completed in '{mode}' mode. \n"
+           f"Signal variability was {variability:.3f} \n"
+           f"threshold = {threshold:.3f} \n"
+           f"Filtering distortion measured {distortion:.3f}.")
 if __name__ == "__main__":
     # Generate two signals
     time, signal_low_noise = generate_signal(noise_level=0.1)
@@ -104,3 +117,9 @@ if __name__ == "__main__":
     print("\nAudit Log:")
     for entry in audit_log:
         print(entry)
+
+    print("\nClinician Summary:")
+    print(clinician_summary(variability_exceeded))
+
+    print("\nEngineer Summary:")
+    print(engineer_summary(MODE, variability, VARIABILITY_THRESHOLD, distortion))
